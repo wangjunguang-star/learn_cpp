@@ -1,16 +1,14 @@
-#include <iostream>
-#include "tree.h"
+#include "utils.h"
 #include "dataset.h"
-
-using namespace std;
+#include "tree.h"
 
 int main(int argc, char** argv) {
     // 首先加载训练数据
-    Dataset dataset("x0", 28);
-    vector<vector<float>> train_x;
-    vector<vector<float>> test_x;
-    vector<uint32_t> train_y;
-    vector<uint32_t> test_y;
+    dataset::Dataset dataset("x0", 28);
+    std::vector<std::vector<float>> train_x;
+    std::vector<std::vector<float>> test_x;
+    std::vector<uint32_t> train_y;
+    std::vector<uint32_t> test_y;
     if(dataset.load()) {
         dataset.get_train_test_dataset(train_x, train_y, test_x, test_y);
     }
@@ -27,7 +25,7 @@ int main(int argc, char** argv) {
 
     std::cout << " 开始训练 \n\n";
     std::cout << " 训练样本信息 :  "  << train_x.size() << "\n\n";
-    Tree tree(feat_num, class_num, 0.75);
+    tree::Tree tree(feat_num, class_num, 0.75);
     tree.fit(train_x, train_y);
 
     std::cout << " Train ok ... \n";

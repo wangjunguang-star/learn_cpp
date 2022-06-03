@@ -1,44 +1,9 @@
-#include <iostream>
-#include <vector>
-#include <set>
-#include <map>
-#include <string>
 #include <random>
 #include <algorithm>
-
 #include "tree.h"
 
-void reduce_y_by_label(const std::vector<uint32_t>& y, std::map<uint32_t, uint32_t>& y_map) {
-    y_map.clear();
-    std::vector<uint32_t>::const_iterator it = y.begin();
-    for(; it!=y.end(); ++it) {
-        if(y_map.find(*it) == y_map.end()) {
-            y_map.insert(std::make_pair(*it, 1));
-        } else {
-            uint32_t& val = y_map[*it];
-            val += 1;
-        }
-    }
-}
 
-float compute_entropy(const std::vector<uint32_t>& y) {
-    float entropy = 0.0;
-    uint32_t y_count = y.size();
-    
-    if(y_count <= 1) {
-        return entropy;
-    }
-
-    std::map<uint32_t, uint32_t> y_map;
-    reduce_y_by_label(y, y_map);
-
-    for(auto it=y_map.begin(); it!=y_map.end(); ++it) {
-        float p = it->second * 1.0 / y_count;
-        entropy += -1 * p * log(p);  // 需要考虑p很小导致的计算问题吗？
-    }
-    
-    return entropy;
-}
+namespace tree {
 
 BaseNode* Tree::_traverse(BaseNode* root, const std::vector<float>& X) const {
     // std::cerr<< " root " << root << "  " << root->get_type() << "\n";
@@ -151,9 +116,9 @@ float Tree::_impurity_gain(const std::vector<float>& x, const std::vector<uint32
         }
     }
  
-    float parent_entropy = compute_entropy(y);
-    float left_entropy = compute_entropy(y_left);
-    float right_entropy = compute_entropy(y_right);
+    float parent_entropy = utils::compute_entropy(y);
+    float left_entropy = utils::compute_entropy(y_left);
+    float right_entropy = utils::compute_entropy(y_right);
     
     // std::cout << " ********* y  |  y_left  |  y_right  = " << y.size() << " | " << y_left.size() << " | "
     //      << y_right.size()  << " | " << split_threshold<< " | "
@@ -169,7 +134,7 @@ BaseNode* Tree::_grow(const std::vector<std::vector<float>>& X, const std::vecto
     assert(X[0].size() == m_feature_num);
     
     std::map<uint32_t, uint32_t> y_map;
-    reduce_y_by_label(y, y_map);
+    utils::reduce_y_by_label(y, y_map);
 
     // 如果只有一个类别或者大于最大深度,返回
     if(y_map.size() == 1 || current_depth >= m_max_depth) {
@@ -234,7 +199,7 @@ void Tree::predict_prob(const std::vector<float>& X, std::map<uint32_t, float>& 
     std::map<uint32_t, uint32_t> y_hat_map;
     
     predict(X, y_hat);
-    reduce_y_by_label(y_hat, y_hat_map);
+    utils::reduce_y_by_label(y_hat, y_hat_map);
 
     uint32_t y_count = y_hat.size();
     for(auto it=y_hat_map.begin(); it!=y_hat_map.end(); ++it) {
@@ -253,4 +218,6 @@ void Tree::fit(const std::vector<std::vector<float>>& X, const std::vector<uint3
     assert(m_root != NULL);
     // std::cout << " tree at:   " << m_root << "\n";
 }
+
+} // namespace tree
 

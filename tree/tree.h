@@ -1,22 +1,12 @@
 #ifndef TREE_H_
 #define TREE_H_
-#include<iostream>
-#include<vector>
-#include<map>
-#include<string>
-#include<assert.h>
-#include<math.h>
-
-// #define ASSERT(ptr) \ 
-//     assert((pctr)!=null)
+#include "utils.h"
 
 #define NAGETIVE_INFINIT -1000000 
 
-void reduce_y_by_label(const std::vector<uint32_t>& y, std::map<uint32_t, uint32_t>& y_map);
+namespace tree {
 
-float compute_entropy(const std::vector<uint32_t>& y);
-
-// 全局变量
+// 每个分割节点的分割信息, 分割特征: split_idx 以及 分割的阈值 split_threshold
 struct SplitInfo {
     uint32_t split_idx;
     float split_threshold;
@@ -27,7 +17,7 @@ class BaseNode {
 public:
     explicit BaseNode() : m_left(NULL)
                         , m_right(NULL)
-                        , m_split_index(0)
+                        , m_split_index(-1)
                         , m_split_threshold(0.0)
                         , m_type("base")
                          {
@@ -103,12 +93,12 @@ public:
 
 class Tree {
 public:
-    explicit Tree(uint32_t feat_num=0, uint32_t class_num=2, float col_sample_tr=1.0)
+    explicit Tree(uint32_t feat_num=0, uint32_t class_num=2, float col_sample_tr=1.0, int max_depth=6)
                 : m_root(NULL)
                 , m_feature_num(feat_num)
                 , m_class_num(class_num)
                 , m_col_sample_ratio(col_sample_tr)
-                , m_max_depth(6) {
+                , m_max_depth(max_depth) {
         m_col_sample_feature_num = static_cast<int>(m_feature_num * m_col_sample_ratio);
         assert(m_col_sample_feature_num > 0 && m_col_sample_feature_num <= m_feature_num);
     }
@@ -150,6 +140,7 @@ private:
     uint32_t m_col_sample_feature_num;
     std::vector<uint32_t> m_features;
 };
+} // namespace tree
 
 
 #endif

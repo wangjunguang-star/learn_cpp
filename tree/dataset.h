@@ -1,17 +1,9 @@
 #ifndef DATASET_H_
 #define DATASET_H_
 
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <string>
-#include <assert.h>
+#include "utils.h"
 
-#include "tree.h"
-
-void split_string(std::string& line, char delimiter, std::vector<std::string>* r);
-void split_string(std::string& line, char delimiter, std::vector<std::string>& r);
-
+namespace dataset {
 
 class Dataset {
 public:
@@ -40,9 +32,9 @@ public:
             std::vector<float> _x;
             while(getline(is, line)) {
                 parts.clear();
-                split_string(line, '\t', parts);
+                int sz = utils::split_string_n(line, '\t', parts);
                 //std::cout << parts.size() << "  " << _x.size()  <<  "  "  << m_feature_num << " \n";
-                assert(parts.size() == m_feature_num + 1);
+                assert(parts.size() == m_feature_num + 1);   // 通过parts.size()来遍历, 一定要确保不会越界访问
                 m_y.push_back(atoi(parts[0].c_str()));
                 _x.clear();
                 for(int i=1; i<parts.size(); ++i) {
@@ -93,5 +85,7 @@ private:
     uint32_t m_sample_num;
 
 };
+
+} // namespace dataset
 
 #endif
