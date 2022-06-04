@@ -1,6 +1,6 @@
 #include "utils.h"
 
-namespace utiles{
+namespace utils{
 
 void split_string(std::string& line, char delimiter, std::vector<std::string>* r)
 {
